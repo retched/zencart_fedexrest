@@ -1,12 +1,12 @@
-# FedExREST
+# FedExREST 
 
-A Zen Cart UPS shipping module that makes use of [FedEx's RESTful API](https://developer.fedex.com/api/en-mx/catalog.html).
+A Zen Cart shipping module for FedEx.  
 
 
 ### Support
 
-- [Installation instructions]()
-- [Forum Support Thread]()
+- [Installation instructions](https://github.com/scottcwilson/zencart_fedexrest/wiki/Installation-Instructions)
+- [Forum Support Thread](https://www.zen-cart.com/showthread.php?229562-FedEx-Shipping-using-REST-API)
 
 ### Developer Resources
 
@@ -14,4 +14,6 @@ A Zen Cart UPS shipping module that makes use of [FedEx's RESTful API](https://d
 - [Rates API](https://developer.fedex.com/api/en-mx/catalog/rate.html#/api)
 
 
-This module replaces the [FedEx Web Services plugin](https://www.zen-cart.com/downloads.php?do=file&id=1784), which was based on the older Web Services XML API, which has been deprecated.
+This module uses [FedEx's RESTful API](https://developer.fedex.com/api/en-mx/catalog.html).
+
+As such, it replaces the [FedEx Web Services plugin](https://www.zen-cart.com/downloads.php?do=file&id=1784), which was based on the (now deprecated) older Web Services XML API.
