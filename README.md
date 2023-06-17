@@ -1,4 +1,4 @@
-f# FedExREST 
+# FedExREST 
 
 A Zen Cart shipping module for FedEx.  
 
@@ -50,5 +50,6 @@ If your goal is to get approximately the same prices as the older Web Services s
 
 Note that you must test with items that are not free shipping and do not use the Numinix "ready to ship" flag.
 
+### Appearance in Storefront
 ![FedEx quotes in the Storefront](images/doc_storefront.png)
 
