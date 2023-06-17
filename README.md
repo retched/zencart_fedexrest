@@ -1,4 +1,4 @@
-# FedExREST 
+# FedExREST plugin
 
 A Zen Cart shipping module for FedEx.  
 
@@ -16,14 +16,14 @@ A Zen Cart shipping module for FedEx.
 
 This module uses [FedEx's RESTful API](https://developer.fedex.com/api/en-mx/catalog.html).
 
-As such, it replaces the [FedEx Web Services plugin](https://www.zen-cart.com/downloads.php?do=file&id=1784), which was based on the (now deprecated) older Web Services XML API.
+As such, it replaces the older [FedEx Web Services plugin](https://www.zen-cart.com/downloads.php?do=file&id=1784), which was based on the (now deprecated) XML API.
 
 ### Configuration 
 
 If your goal is to get approximately the same prices as the [FedEx Online Rating Tool](https://www.fedex.com/en-us/online/rating.html#), use these settings: 
 
 - In the online rating tool: 
-  - Enter the ship from and to addresses, the weight and number of packages.  Leave all other settings at their default values. 
+  - Enter the ship from and to addresses, the weight and number of packages.  Leave all other settings at their default values.   Be sure the weight and number of packages matches *exactly* what Zen Cart is using - 1 package weighing 100 pounds is rated differently than 10 packages weighing 10 pounds. 
 
 - In Zen Cart Admin settings for FedEx REST: 
   - Ship From address is residential = false
@@ -33,9 +33,9 @@ If your goal is to get approximately the same prices as the [FedEx Online Rating
   - Insurance = -1 
   - FedEx Rates = LIST 
 
-If your goal is to get approximately the same prices as the older Web Services shipping method, use these settings:
+If your goal is to get approximately the same prices as the older FedEx Web Services plugin, use these settings:
 
-- In the older FedEx module: 
+- In the Zen Cart Admin settings for the FedEx Web Services plugin: 
   - Enable Address Validation = false
   - Drop off type to 1 or 3. 
   - FedEx Rates = LIST 
@@ -48,7 +48,7 @@ If your goal is to get approximately the same prices as the older Web Services s
   - Insurance = 0 
   - FedEx Rates = LIST 
 
-Note that you must test with items that are not free shipping and do not use the Numinix "ready to ship" flag.
+Note that you must test with items that are not free shipping and do not use the Numinix "ready to ship" flag.  Those features are not supported by this plugin. 
 
 ### Appearance in Storefront
 ![FedEx quotes in the Storefront](images/doc_storefront.png)
