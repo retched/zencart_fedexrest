@@ -23,7 +23,9 @@ As such, it replaces the older [FedEx Web Services plugin](https://www.zen-cart.
 If your goal is to get approximately the same prices as the [FedEx Online Rating Tool](https://www.fedex.com/en-us/online/rating.html#), use these settings: 
 
 - In the online rating tool: 
-  - Enter the ship from and to addresses, the weight and number of packages.  Leave all other settings at their default values.   Be sure the weight and number of packages matches *exactly* what Zen Cart is using - 1 package weighing 100 pounds is rated differently than 10 packages weighing 10 pounds. 
+  - Enter the ship from and to addresses, the weight and number of packages.  Leave all other settings at their default values.   Be sure the weight and number of packages matches exactly what Zen Cart is using.
+  - Be sure the checkbox for "I want this shipment picked up" is unchecked (e.g. you want drop off)
+  - Be sure the checkbox for "shipping to a residence" is unchecked.
 
 - In Zen Cart Admin settings for FedEx REST: 
   - Ship From address is residential = false
