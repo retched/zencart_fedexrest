@@ -1,7 +1,6 @@
 # FedExREST plugin
 
-A Zen Cart shipping module for FedEx.  
-
+A Zen Cart shipping module for FedEx.  This module returns FedEx rates for shipping from your location to your customer.
 
 ### Support
 
@@ -27,7 +26,7 @@ If your goal is to get approximately the same prices as the [FedEx Online Rating
   - Be sure the checkbox for "I want this shipment picked up" is unchecked (e.g. you want drop off)
   - Be sure the checkbox for "shipping to a residence" is unchecked.
 
-- In Zen Cart Admin settings for FedEx REST: 
+- In Zen Cart Admin settings for FedEx REST (this module): 
   - Ship From address is residential = false
   - Ship To address is residential = false
   - Pickup type = 3
@@ -37,12 +36,12 @@ If your goal is to get approximately the same prices as the [FedEx Online Rating
 
 If your goal is to get approximately the same prices as the older FedEx Web Services plugin, use these settings:
 
-- In the Zen Cart Admin settings for the FedEx Web Services plugin: 
+- In the Zen Cart Admin settings for the older FedEx Web Services plugin: 
   - Enable Address Validation = false
   - Drop off type to 1 or 3. 
   - FedEx Rates = LIST 
 
-- In Zen Cart Admin settings for FedEx REST: 
+- In Zen Cart Admin settings for FedEx REST (this module): 
   - Ship From address is residential = false
   - Ship To address is residential = true 
   - Pickup type = 1 or 3, based on whichever value is used in older module Drop off type setting
