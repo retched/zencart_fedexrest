@@ -34,6 +34,9 @@ If your goal is to get approximately the same prices as the [FedEx Online Rating
   - Insurance = -1 
   - FedEx Rates = LIST 
 
+Note that at this time (June 2023), the GROUND rates don't match but all others do.  I have asked FedEx about this but not received a response. 
+
+<hr>
 If your goal is to get approximately the same prices as the older FedEx Web Services plugin, use these settings:
 
 - In the Zen Cart Admin settings for the older FedEx Web Services plugin: 

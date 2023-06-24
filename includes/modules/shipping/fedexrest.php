@@ -11,10 +11,9 @@
 
    /*
     * TODO LIST:
+    * Ground shipping price vs. online rating tool 
     * Street address for send and receive
-    * Are surcharges correctly handled? 
     * Keep token around - see upsoauth_token_expires
-    * $tax_basis
     */
 
    class fedexrest
@@ -98,6 +97,7 @@
          $this->icon = '';
          $this->enabled = (MODULE_SHIPPING_FEDEX_REST_STATUS === 'true');
          $this->tax_class = MODULE_SHIPPING_FEDEX_REST_TAX_CLASS;
+         $this->tax_basis = MODULE_SHIPPING_FEDEX_REST_TAX_BASIS;
          $this->fedex_act_num = MODULE_SHIPPING_FEDEX_REST_ACT_NUM;
 
          if (defined("SHIPPING_ORIGIN_COUNTRY")) {
@@ -435,6 +435,10 @@
             if (array_key_exists($serviceType, $this->types) && ($method == '' || str_replace('_', '', $serviceType) == $method)) {
                $cost = $rate['ratedShipmentDetails'][0]['totalNetFedExCharge'];
 
+               // add on specified fees - could be % or flat rate
+               $fee = ($this->types[$serviceType]['handling_fee'] ?? 0);
+               $cost = $cost + ((strpos($fee, '%') !== FALSE) ? ($cost * (float)$fee / 100) : (float)$fee);
+               
                // Show transit time? 
                $transitTime = '';
                if (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' && in_array($serviceType, array('GROUND_HOME_DELIVERY', 'FEDEX_GROUND', 'INTERNATIONAL_GROUND'))) {
@@ -527,6 +531,7 @@
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Insurance', 'MODULE_SHIPPING_FEDEX_REST_INSURE', '-1', 'Insure packages when subtotal is greater than or equal to (set to -1 to disable):', '6', '120', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Shipping Zone', 'MODULE_SHIPPING_FEDEX_REST_ZONE', '0', 'If a zone is selected, only enable this shipping method for that zone.', '6', '130', 'zen_get_zone_class_title', 'zen_cfg_pull_down_zone_classes(', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Tax Class', 'MODULE_SHIPPING_FEDEX_REST_TAX_CLASS', '0', 'Use the following tax class on the shipping fee.', '6', '135', 'zen_get_tax_class_title', 'zen_cfg_pull_down_tax_classes(', now())");
+    $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Tax Basis', 'MODULE_SHIPPING_FEDEX_REST_TAX_BASIS', 'Shipping', 'On what basis is Shipping Tax calculated. Options are<br>Shipping - Based on customers Shipping Address<br>Billing Based on customers Billing address<br>Store - Based on Store address if Billing/Shipping Zone equals Store zone', '6', '0', 'zen_cfg_select_option(array(\'Shipping\', \'Billing\', \'Store\'), ', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_SHIPPING_FEDEX_REST_SORT_ORDER', '0', 'Sort order of display.', '6', '998', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Debug', 'MODULE_SHIPPING_FEDEX_REST_DEBUG', 'false', 'Turn On Debugging?', '6', '999', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
       }
@@ -566,6 +571,7 @@
             'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_GROUND',
             'MODULE_SHIPPING_FEDEX_REST_SATURDAY',
             'MODULE_SHIPPING_FEDEX_REST_TAX_CLASS',
+            'MODULE_SHIPPING_FEDEX_REST_TAX_BASIS',
             'MODULE_SHIPPING_FEDEX_REST_HANDLING_FEE',
             'MODULE_SHIPPING_FEDEX_REST_HOME_DELIVERY_HANDLING_FEE',
             'MODULE_SHIPPING_FEDEX_REST_EXPRESS_HANDLING_FEE',
