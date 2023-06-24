@@ -50,7 +50,7 @@ If your goal is to get approximately the same prices as the older FedEx Web Serv
   - FedEx Rates = LIST 
 
 Note that you must test with items that are not free shipping and do not use the Numinix "ready to ship" flag.  Those features are not supported by this plugin. 
-Be sure the FedEx Account Number for the old and new shipping modules have the same value to get an apples-to-apples comparison.
+Be sure the FedEx Account Number, ship from address, etc. for the old and new shipping modules have the same values to get an apples-to-apples comparison.
 
 ### Appearance in Storefront
 ![FedEx quotes in the Storefront](images/doc_storefront.png)

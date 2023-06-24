@@ -325,7 +325,7 @@
          }
 
          $requestControlParms = [
-            'returnTransitTimes' => (MODULE_SHIPPING_FEDEX_WEB_SERVICES_TRANSIT_TIME == 'true' ? 'TRUE' : 'FALSE'),
+            'returnTransitTimes' => (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' ? 'TRUE' : 'FALSE'),
          ];
          if (MODULE_SHIPPING_FEDEX_REST_SATURDAY == 'true') {
            $requestControlParms += [
@@ -373,7 +373,8 @@
                "documentShipment" => false,
                "packagingType" => "YOUR_PACKAGING",
                "totalPackageCount" => $this->fedex_shipping_num_boxes, 
-               "groupShipment" => true
+               "groupShipment" => true,
+               "groundShipment" => true
             ],
             "carrierCodes" => ["FDXG", "FDXE"],
          ];
@@ -436,7 +437,7 @@
 
                // Show transit time? 
                $transitTime = '';
-               if (MODULE_SHIPPING_FEDEX_WEB_SERVICES_TRANSIT_TIME == 'true' && in_array($serviceType, array('GROUND_HOME_DELIVERY', 'FEDEX_GROUND', 'INTERNATIONAL_GROUND'))) {
+               if (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' && in_array($serviceType, array('GROUND_HOME_DELIVERY', 'FEDEX_GROUND', 'INTERNATIONAL_GROUND'))) {
                   $transitTime = ' (' . str_replace(array('_', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen'), array(' business ', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), strtolower($rate['operationalDetail']['transitTime'])) . ')';
                }
 
