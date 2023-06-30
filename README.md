@@ -19,7 +19,9 @@ As such, it replaces the older [FedEx Web Services plugin](https://www.zen-cart.
 
 ### Configuration 
 
-If your goal is to get approximately the same prices as the [FedEx Online Rating Tool](https://www.fedex.com/en-us/online/rating.html#), use these settings: 
+If your goal is to match the [FedEx Online Rating Tool](https://www.fedex.com/en-us/online/rating.html#), please note: the online tool quotes "counter rates," which are not available either from the REST API or the older Web Services API.  
+
+You can get close to their rates for most services (Ground is a notable exception) with these settings: 
 
 - In the online rating tool: 
   - Enter the ship from and to addresses, the weight and number of packages.  Leave all other settings at their default values.   Be sure the weight and number of packages matches exactly what Zen Cart is using.
@@ -34,10 +36,8 @@ If your goal is to get approximately the same prices as the [FedEx Online Rating
   - Insurance = -1 
   - FedEx Rates = LIST 
 
-Note that at this time (June 2023), the GROUND rates don't match but all others do.  I have asked FedEx about this but not received a response. 
-
 <hr>
-If your goal is to get approximately the same prices as the older FedEx Web Services plugin, use these settings:
+If your goal is to match the older FedEx Web Services plugin, use these settings:
 
 - In the Zen Cart Admin settings for the older FedEx Web Services plugin: 
   - Enable Address Validation = false

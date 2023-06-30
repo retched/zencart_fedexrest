@@ -11,7 +11,6 @@
 
    /*
     * TODO LIST:
-    * Ground shipping price vs. online rating tool 
     * Street address for send and receive
     * Keep token around - see upsoauth_token_expires
     */
@@ -436,7 +435,10 @@
                $cost = $rate['ratedShipmentDetails'][0]['totalNetFedExCharge'];
 
                // add on specified fees - could be % or flat rate
-               $fee = ($this->types[$serviceType]['handling_fee'] ?? 0);
+               $fee = 0; 
+               if (!empty($this->types[$serviceType]['handling_fee'])) { 
+                  $fee = $this->types[$serviceType]['handling_fee']; 
+               }
                $cost = $cost + ((strpos($fee, '%') !== FALSE) ? ($cost * (float)$fee / 100) : (float)$fee);
                
                // Show transit time? 
@@ -453,7 +455,11 @@
             }
          }
 
-         if (sizeof($methods) == 0) return false;
+         // Early exit for no rates
+         if (sizeof($methods) == 0) {
+            return false;
+         }
+
          $quotes['methods'] = $methods;
          if ($this->tax_class > 0) {
             $quotes['tax'] = zen_get_tax_rate($this->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
