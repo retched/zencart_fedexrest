@@ -5,6 +5,7 @@
 // Based on work by Numinix, Vinos de Frutas Tropicales, and many others.
 // Portions Copyright 2003 osCommerce
 // Portions Copyright 2003-2023 Zen Cart Development Team
+// Portions Copyright Vinos de Frutas Tropicales
 // Copyright 2023 That Software Guy 
 // Additional documentation: 
 // https://github.com/scottcwilson/zencart_fedexrest
@@ -12,11 +13,11 @@
    /*
     * TODO LIST:
     * Street address for send and receive
-    * Keep token around - see upsoauth_token_expires
     */
 
    class fedexrest
    {
+      const BASE_URL = 'https://apis.fedex.com';
 
       /**
        * $code determines the internal 'code' name used to designate "this" shipping module
@@ -134,6 +135,9 @@
                $this->enabled = false;
             }
          }
+        if ($this->enabled === true && $this->getOAuthToken() === false) {
+            $this->enabled = false;
+        }
          if ($this->enabled) {
             $this->setTypes();
          }
@@ -211,15 +215,19 @@
          return $this->quotes;
       }
 
-      function getRates($method)
+
+      function getOAuthToken()
       {
-         global $order, $db, $shipping_weight, $shipping_num_boxes;
-         $base_url = 'https://apis.fedex.com';
-         // First get the bearer token
+          if (isset($_SESSION['fedexrest_token_expires']) && $_SESSION['fedexrest_token_expires'] > time()) {
+              $this->debugLog('Existing OAuth token is present.');
+              return true;
+          }
+  
+         // Get the bearer token
          // https://developer.fedex.com/api/en-us/catalog/authorization/v1/docs.html
 
-         // $this->debugLog("Date and Time: " . date('Y-m-d H:i:s') . PHP_EOL . "FEDEX URL: $base_url", true);
-         $url = $base_url . '/oauth/token';
+         $this->debugLog("Date and Time: " . date('Y-m-d H:i:s') . PHP_EOL . "FEDEX URL: " . self::BASE_URL, true);
+         $url = self::BASE_URL . '/oauth/token';
          $timeout = 15;
          $ch = curl_init();
          $input = 'grant_type=' . 'client_credentials' . '&' .
@@ -243,24 +251,49 @@
 
          $response = curl_exec($ch);
          if (curl_errno($ch) !== 0) {
-            // $this->debugLog('Error from cURL: ' . sprintf('Error [%d]: %s', curl_errno($ch), curl_error($ch)));
+            $this->debugLog('Error from cURL: ' . sprintf('Error [%d]: %s', curl_errno($ch), curl_error($ch)));
             echo 'Error from cURL: ' . sprintf('Error [%d]: %s', curl_errno($ch), curl_error($ch));
+            curl_close($ch);
+            return false;  
          }
          curl_close($ch);
 
          $arr_response = json_decode($response, true);
          $this->debugLog("Auth Response: " . print_r($arr_response, true));
 
-         if (!isset($arr_response['access_token'])) return false;
-         $access_token = $arr_response['access_token'];
+         if (!isset($arr_response['access_token'])) {
+            // Ruh roh.  How bad is it? 
+            if (isset($arr_response['errors'])) {
+               // look for bad client creds error 
+               foreach ($arr_response['errors'] as $errobj) {
+                  if ($errobj['code'] == 'NOT.AUTHORIZED.ERROR') {
+                        global $db;
+                        $db->Execute("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = 'false' WHERE configuration_key = 'MODULE_SHIPPING_FEDEX_REST_STATUS'");
+                        zen_mail(STORE_NAME, STORE_OWNER_EMAIL_ADDRESS, MODULE_SHIPPING_FEDEXREST_EMAIL_SUBJECT, MODULE_SHIPPING_FEDEXREST_INVALID_CREDENTIALS, STORE_NAME, EMAIL_FROM);
+                  }
+               }
+            }
+            return false;
+         }
 
-         // Now do the rate query
+         if (IS_ADMIN_FLAG === false) {
+            $_SESSION['fedexrest_token'] = $arr_response['access_token'];
+            $_SESSION['fedexrest_token_expires'] = time() + $arr_response['expires_in'] - 3;
+         }
+         return true; 
+      }
+
+      function getRates($method)
+      {
+         global $order, $db, $shipping_weight, $shipping_num_boxes;
+
+         // Do the rate query
          // https://developer.fedex.com/api/en-us/catalog/rate/v1/docs.html
          $ch = curl_init();
 
-         $url = $base_url . '/rate/v1/rates/quotes';
+         $url = self::BASE_URL . '/rate/v1/rates/quotes';
          $rate_hdrs = [
-            "Authorization: Bearer " . $access_token,
+            "Authorization: Bearer " . $_SESSION['fedexrest_token'], 
             "X-locale: " . MODULE_SHIPPING_FEDEX_REST_TEXT_LOCALE,
             "Content-Type: application/json",
          ];
