@@ -70,7 +70,7 @@
        * @var int
        */
       protected $_check;
-      protected $moduleVersion = '0.9';
+      protected $moduleVersion = '0.91';
 
       protected $fedex_act_num,
          $country,
@@ -478,6 +478,9 @@
                $transitTime = '';
                if (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' && in_array($serviceType, array('GROUND_HOME_DELIVERY', 'FEDEX_GROUND', 'INTERNATIONAL_GROUND'))) {
                   $transitTime = ' (' . str_replace(array('_', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen'), array(' business ', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), strtolower($rate['operationalDetail']['transitTime'])) . ')';
+               }
+               if (!empty($rate['commit']['saturdayDelivery']) && $rate['commit']['saturdayDelivery'] == 1) {
+                  $transitTime .= MODULE_SHIPPING_FEDEXREST_SATURDAY; 
                }
 
                $methods[] = [
