@@ -70,7 +70,7 @@
        * @var int
        */
       protected $_check;
-      protected $moduleVersion = '0.91';
+      protected $moduleVersion = '1.00';
 
       protected $fedex_act_num,
          $country,
@@ -289,6 +289,7 @@
 
          // Do the rate query
          // https://developer.fedex.com/api/en-us/catalog/rate/v1/docs.html
+         $timeout = 15;
          $ch = curl_init();
 
          $url = self::BASE_URL . '/rate/v1/rates/quotes';
@@ -327,10 +328,12 @@
          $box_value = round($shipped_value / $this->fedex_shipping_num_boxes, 2);
          $packageSpecialServices = []; 
          if (!empty(MODULE_SHIPPING_FEDEX_REST_SIGNATURE_OPTION) && MODULE_SHIPPING_FEDEX_REST_SIGNATURE_OPTION > -1 && $shipped_value >= MODULE_SHIPPING_FEDEX_REST_SIGNATURE_OPTION) {
-            $packageSpecialServices = [
-               'specialServiceTypes' => 'SIGNATURE_OPTION',
-               'signatureOptionType' => 'SERVICE_DEFAULT', 
-            ]; 
+            // Only works in the US
+            if ($country_id == 'US') { 
+               $packageSpecialServices = [
+                  'signatureOptionType' => 'INDIRECT',
+               ]; 
+            }
          }
 //MODULE_SHIPPING_FEDEX_REST_INSURE  
          for ($i = 0; $i < $this->fedex_shipping_num_boxes; $i++) {
