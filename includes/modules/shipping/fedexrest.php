@@ -70,7 +70,7 @@
        * @var int
        */
       protected $_check;
-      protected $moduleVersion = '1.00';
+      protected $moduleVersion = '1.1';
 
       protected $fedex_act_num,
          $country,
@@ -139,7 +139,9 @@
             $this->enabled = false;
         }
          if ($this->enabled) {
-            $this->setTypes();
+            if (IS_ADMIN_FLAG === false) {
+               $this->setTypes();
+            }
          }
       }
 
@@ -166,11 +168,14 @@
 
          $this->types = [];
          if (MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_PRIORITY == 'true') {
-            $this->types['INTERNATIONAL_PRIORITY'] = array('icon' => '', 'handling_fee' => MODULE_SHIPPING_FEDEX_REST_INT_EXPRESS_HANDLING_FEE);
+            $this->types['FEDEX_INTERNATIONAL_PRIORITY'] = array('icon' => '', 'handling_fee' => MODULE_SHIPPING_FEDEX_REST_INT_EXPRESS_HANDLING_FEE);
             $this->types['EUROPE_FIRST_INTERNATIONAL_PRIORITY'] = array('icon' => '', 'handling_fee' => MODULE_SHIPPING_FEDEX_REST_INT_EXPRESS_HANDLING_FEE);
          }
          if (MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_ECONOMY == 'true') {
             $this->types['INTERNATIONAL_ECONOMY'] = array('icon' => '', 'handling_fee' => MODULE_SHIPPING_FEDEX_REST_INT_EXPRESS_HANDLING_FEE);
+         }
+         if (defined('MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_CONNECT_PLUS') && MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_CONNECT_PLUS == 'true') {
+            $this->types['FEDEX_INTERNATIONAL_CONNECT_PLUS'] = array('icon' => '', 'handling_fee' => MODULE_SHIPPING_FEDEX_REST_INT_EXPRESS_HANDLING_FEE); 
          }
          if (MODULE_SHIPPING_FEDEX_REST_STANDARD_OVERNIGHT == 'true') {
             $this->types['STANDARD_OVERNIGHT'] = array('icon' => '', 'handling_fee' => MODULE_SHIPPING_FEDEX_REST_EXPRESS_HANDLING_FEE);
@@ -301,8 +306,8 @@
 
          // customer details
          $street_address = $order->delivery['street_address'];
-         $street_address2 = $order->delivery['suburb'];
-         $city = $order->delivery['city'];
+         $street_address2 = $order->delivery['suburb'] ?? '';
+         $city = $order->delivery['city'] ?? '';
          if (isset($order->delivery['country']['id'])) {
             $state = zen_get_zone_code($order->delivery['country']['id'], intval($order->delivery['zone_id']), '');
          } else {
@@ -310,6 +315,7 @@
             $state = zen_get_zone_code($countryId->fields['countries_id'], intval($order->delivery['zone_id']), '');
          }
          if ($state == "QC") $state = "PQ";
+         if (empty($order->delivery['postcode'])) $order->delivery['postcode'] = '';
          $postcode = str_replace(array(' ', '-'), '', $order->delivery['postcode']);
          if (isset($order->delivery['country']['iso_code_2'])) {
             $country_id = $order->delivery['country']['iso_code_2'];
@@ -413,6 +419,26 @@
             ],
             "carrierCodes" => ["FDXG", "FDXE"],
          ];
+
+         if ($country_id != MODULE_SHIPPING_FEDEX_REST_COUNTRY) { 
+            $rate_data ["requestedShipment"]["customsClearanceDetail"] = [ 
+               "commodities" => [ 
+                  [ "description" => "Goods", 
+                  "quantity" => "1", 
+                  "quantityUnits" => "PCS", 
+                  "weight" => [ 
+                     "units" => MODULE_SHIPPING_FEDEX_REST_WEIGHT, 
+                     "value" => ($_SESSION['cart']->show_weight()), 
+                  ], 
+                  "customsValue" => [ 
+                     "amount" => ($_SESSION['cart']->show_total()), 
+                     "currency" => $_SESSION['currency'],
+                  ], 
+                  ], 
+               ], 
+            ]; 
+         }
+
          /*
                echo '<pre>';
                print_r($rate_data);
@@ -561,6 +587,7 @@
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable 2 Day', 'MODULE_SHIPPING_FEDEX_REST_2DAY', 'true', 'Enable FedEx Express 2 Day', '6', '54', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable International Priority', 'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_PRIORITY', 'true', 'Enable FedEx Express International Priority', '6', '55', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable International Economy', 'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_ECONOMY', 'true', 'Enable FedEx Express International Economy', '6', '56', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
+         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable International Connect Plus', 'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_CONNECT_PLUS', 'true', 'Enable FedEx Express International Connect Plus', '6', '56', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Ground', 'MODULE_SHIPPING_FEDEX_REST_GROUND', 'true', 'Enable FedEx Ground', '6', '57', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable International Ground', 'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_GROUND', 'true', 'Enable FedEx International Ground', '6', '58', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Freight', 'MODULE_SHIPPING_FEDEX_REST_FREIGHT', 'true', 'Enable FedEx Freight', '6', '59', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
@@ -611,6 +638,7 @@
             'MODULE_SHIPPING_FEDEX_REST_2DAY',
             'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_PRIORITY',
             'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_ECONOMY',
+            'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_CONNECT_PLUS',
             'MODULE_SHIPPING_FEDEX_REST_GROUND',
             'MODULE_SHIPPING_FEDEX_REST_FREIGHT',
             'MODULE_SHIPPING_FEDEX_REST_INTERNATIONAL_GROUND',
