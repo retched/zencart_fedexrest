@@ -305,7 +305,7 @@
          ];
 
          // customer details
-         $street_address = $order->delivery['street_address'];
+         $street_address = $order->delivery['street_address'] ?? '';
          $street_address2 = $order->delivery['suburb'] ?? '';
          $city = $order->delivery['city'] ?? '';
          if (isset($order->delivery['country']['id'])) {
