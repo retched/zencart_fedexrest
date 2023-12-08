@@ -89,9 +89,9 @@
          $this->title = MODULE_SHIPPING_FEDEX_REST_TEXT_TITLE;
 
          if (IS_ADMIN_FLAG === true) {
-            $this->title .= ' v' . $this->moduleVersion;
+            $this->title = MODULE_SHIPPING_FEDEX_REST_TEXT_TITLE . ' v' . $this->moduleVersion;
          }
-         $this->description = MODULE_SHIPPING_FEDEX_REST_TEXT_DESCRIPTION;
+         $this->description = MODULE_SHIPPING_FEDEX_TEXT_TITLE;
          $this->sort_order = defined('MODULE_SHIPPING_FEDEX_REST_SORT_ORDER') ? MODULE_SHIPPING_FEDEX_REST_SORT_ORDER : null;
          if (null === $this->sort_order) return false;
          $this->icon = '';
