@@ -2,6 +2,8 @@
 
 A Zen Cart shipping module for FedEx.  This module returns FedEx rates for shipping from your location to your customer.
 
+Contributions supporting the development of this software are most appreciated. [Donate here](https://www.thatsoftwareguy.com/store/index.php?main_page=index&cPath=11).
+
 ### Support
 
 - [Installation instructions](https://github.com/scottcwilson/zencart_fedexrest/wiki/Installation-Instructions)
