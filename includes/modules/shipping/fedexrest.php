@@ -18,6 +18,7 @@
    class fedexrest
    {
       const BASE_URL = 'https://apis.fedex.com';
+      const SAT_SUFFIX = 'SAT'; 
 
       /**
        * $code determines the internal 'code' name used to designate "this" shipping module
@@ -381,6 +382,9 @@
          } else { 
             $ship_to_residential = (empty($order->delivery['company'])); 
          }
+
+         $shipDate = new DateTime();
+         // $shipDate->modify('next thursday');
          $rate_data = [
             "accountNumber" => [
                "value" => MODULE_SHIPPING_FEDEX_REST_ACT_NUM
@@ -408,7 +412,7 @@
                "rateRequestType" => [
                   (MODULE_SHIPPING_FEDEX_REST_RATES == 'LIST' ? 'LIST' : 'ACCOUNT'),
                ],
-               "shipDateStamp" => date("Y-m-d"),
+               "shipDateStamp" => $shipDate->format("Y-m-d"),
                "pickupType" => $this->_setPickup(),
                "requestedPackageLineItems" => $packages,
                "documentShipment" => false,
@@ -493,9 +497,29 @@
          foreach ($arr_response['output']['rateReplyDetails'] as $rate) {
             $serviceType = $rate['serviceType'];
             // ensure key exists (i.e. service enabled) 
-            if (array_key_exists($serviceType, $this->types) && ($method == '' || str_replace('_', '', $serviceType) == $method)) {
-               $cost = $rate['ratedShipmentDetails'][0]['totalNetFedExCharge'];
+            $check_serviceType = str_replace('_', '', $serviceType); 
+            $method_ok = false; 
+            if (array_key_exists($serviceType, $this->types)) {
+               if ($method == '') {
+                  $method_ok = true;
+               } else if ($check_serviceType == $method) {
+                  $method_ok = true;
+               } else if ($check_serviceType . self::SAT_SUFFIX == $method) {
+                  $method_ok = true;
+               }
+            } 
+            if (!$method_ok) continue; 
+            // We have to make sure it's not Saturday if not wanted
+            if (!empty($method)) {
+               if (!empty($rate['commit']['saturdayDelivery']) && $rate['commit']['saturdayDelivery'] == 1) {
+                  if (($check_serviceType . self::SAT_SUFFIX) !== $method) {
+                     continue; 
+                  }
+               }
+            }
 
+            if ($method_ok) {
+               $cost = $rate['ratedShipmentDetails'][0]['totalNetFedExCharge'];
                // add on specified fees - could be % or flat rate
                $fee = 0; 
                if (!empty($this->types[$serviceType]['handling_fee'])) { 
@@ -508,12 +532,14 @@
                if (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' && in_array($serviceType, array('GROUND_HOME_DELIVERY', 'FEDEX_GROUND', 'INTERNATIONAL_GROUND'))) {
                   $transitTime = ' (' . str_replace(array('_', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen'), array(' business ', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), strtolower($rate['operationalDetail']['transitTime'])) . ')';
                }
+               $id_suffix = ''; 
                if (!empty($rate['commit']['saturdayDelivery']) && $rate['commit']['saturdayDelivery'] == 1) {
                   $transitTime .= MODULE_SHIPPING_FEDEXREST_SATURDAY; 
+                  $id_suffix = self::SAT_SUFFIX; 
                }
 
                $methods[] = [
-                  'id' => str_replace('_', '', $serviceType),
+                  'id' => str_replace('_', '', $serviceType) . $id_suffix,
                   'title' => ucwords(strtolower(str_replace('_', ' ', $serviceType))) . $transitTime,
                   'cost' => $cost
                ];
