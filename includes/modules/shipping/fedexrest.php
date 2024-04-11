@@ -18,7 +18,6 @@
    class fedexrest
    {
       const BASE_URL = 'https://apis.fedex.com';
-      const SAT_SUFFIX = 'SAT'; 
 
       /**
        * $code determines the internal 'code' name used to designate "this" shipping module
@@ -71,7 +70,7 @@
        * @var int
        */
       protected $_check;
-      protected $moduleVersion = '1.2';
+      protected $moduleVersion = '1.1';
 
       protected $fedex_act_num,
          $country,
@@ -90,9 +89,9 @@
          $this->title = MODULE_SHIPPING_FEDEX_REST_TEXT_TITLE;
 
          if (IS_ADMIN_FLAG === true) {
-            $this->title = MODULE_SHIPPING_FEDEX_REST_TEXT_TITLE . ' v' . $this->moduleVersion;
+            $this->title .= ' v' . $this->moduleVersion;
          }
-         $this->description = MODULE_SHIPPING_FEDEX_TEXT_TITLE;
+         $this->description = MODULE_SHIPPING_FEDEX_REST_TEXT_DESCRIPTION;
          $this->sort_order = defined('MODULE_SHIPPING_FEDEX_REST_SORT_ORDER') ? MODULE_SHIPPING_FEDEX_REST_SORT_ORDER : null;
          if (null === $this->sort_order) return false;
          $this->icon = '';
@@ -306,7 +305,7 @@
          ];
 
          // customer details
-         $street_address = $order->delivery['street_address'] ?? '';
+         $street_address = $order->delivery['street_address'];
          $street_address2 = $order->delivery['suburb'] ?? '';
          $city = $order->delivery['city'] ?? '';
          if (isset($order->delivery['country']['id'])) {
@@ -382,9 +381,6 @@
          } else { 
             $ship_to_residential = (empty($order->delivery['company'])); 
          }
-
-         $shipDate = new DateTime();
-         // $shipDate->modify('next thursday');
          $rate_data = [
             "accountNumber" => [
                "value" => MODULE_SHIPPING_FEDEX_REST_ACT_NUM
@@ -412,7 +408,7 @@
                "rateRequestType" => [
                   (MODULE_SHIPPING_FEDEX_REST_RATES == 'LIST' ? 'LIST' : 'ACCOUNT'),
                ],
-               "shipDateStamp" => $shipDate->format("Y-m-d"),
+               "shipDateStamp" => date("Y-m-d"),
                "pickupType" => $this->_setPickup(),
                "requestedPackageLineItems" => $packages,
                "documentShipment" => false,
@@ -497,29 +493,9 @@
          foreach ($arr_response['output']['rateReplyDetails'] as $rate) {
             $serviceType = $rate['serviceType'];
             // ensure key exists (i.e. service enabled) 
-            $check_serviceType = str_replace('_', '', $serviceType); 
-            $method_ok = false; 
-            if (array_key_exists($serviceType, $this->types)) {
-               if ($method == '') {
-                  $method_ok = true;
-               } else if ($check_serviceType == $method) {
-                  $method_ok = true;
-               } else if ($check_serviceType . self::SAT_SUFFIX == $method) {
-                  $method_ok = true;
-               }
-            } 
-            if (!$method_ok) continue; 
-            // We have to make sure it's not Saturday if not wanted
-            if (!empty($method)) {
-               if (!empty($rate['commit']['saturdayDelivery']) && $rate['commit']['saturdayDelivery'] == 1) {
-                  if (($check_serviceType . self::SAT_SUFFIX) !== $method) {
-                     continue; 
-                  }
-               }
-            }
-
-            if ($method_ok) {
+            if (array_key_exists($serviceType, $this->types) && ($method == '' || str_replace('_', '', $serviceType) == $method)) {
                $cost = $rate['ratedShipmentDetails'][0]['totalNetFedExCharge'];
+
                // add on specified fees - could be % or flat rate
                $fee = 0; 
                if (!empty($this->types[$serviceType]['handling_fee'])) { 
@@ -532,14 +508,12 @@
                if (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' && in_array($serviceType, array('GROUND_HOME_DELIVERY', 'FEDEX_GROUND', 'INTERNATIONAL_GROUND'))) {
                   $transitTime = ' (' . str_replace(array('_', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen'), array(' business ', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), strtolower($rate['operationalDetail']['transitTime'])) . ')';
                }
-               $id_suffix = ''; 
                if (!empty($rate['commit']['saturdayDelivery']) && $rate['commit']['saturdayDelivery'] == 1) {
                   $transitTime .= MODULE_SHIPPING_FEDEXREST_SATURDAY; 
-                  $id_suffix = self::SAT_SUFFIX; 
                }
 
                $methods[] = [
-                  'id' => str_replace('_', '', $serviceType) . $id_suffix,
+                  'id' => str_replace('_', '', $serviceType),
                   'title' => ucwords(strtolower(str_replace('_', ' ', $serviceType))) . $transitTime,
                   'cost' => $cost
                ];
