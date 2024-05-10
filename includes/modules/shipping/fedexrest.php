@@ -71,7 +71,7 @@
        * @var int
        */
       protected $_check;
-      protected $moduleVersion = '1.3.1';
+      protected $moduleVersion = '1.3.2';
 
       protected $fedex_act_num,
          $country,
@@ -117,9 +117,10 @@
 
          $this->debug = (MODULE_SHIPPING_FEDEX_REST_DEBUG === 'true');
          $this->logfile = DIR_FS_LOGS . '/fedexrest-' . date('Ymd') . '.log';
-         if (($this->enabled == true) && ((int)MODULE_SHIPPING_FEDEX_REST_ZONE > 0)) {
+         if (($this->enabled == true) && ((int)MODULE_SHIPPING_FEDEX_REST_ZONE > 0) && !IS_ADMIN_FLAG) {
 
             $check_flag = false;
+            if (isset($order->delivery['country']['id'])) {
             $check = $db->Execute("select zone_id from " . TABLE_ZONES_TO_GEO_ZONES . " where geo_zone_id = '" . MODULE_SHIPPING_FEDEX_REST_ZONE . "' and zone_country_id = '" . $order->delivery['country']['id'] . "' order by zone_id");
             while (!$check->EOF) {
                if ($check->fields['zone_id'] < 1) {
@@ -130,6 +131,7 @@
                   break;
                }
                $check->MoveNext();
+            }
             }
 
             if ($check_flag == false) {
@@ -508,6 +510,7 @@
                   $method_ok = true;
                }
             } 
+            if (!isset($rate['ratedShipmentDetails'][0])) $method_ok = false;
             if (!$method_ok) continue; 
             // We have to make sure it's not Saturday if not wanted
             if (!empty($method)) {
@@ -530,7 +533,7 @@
                // Show transit time? 
                $transitTime = '';
                if (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' && in_array($serviceType, array('GROUND_HOME_DELIVERY', 'FEDEX_GROUND', 'INTERNATIONAL_GROUND'))) {
-                  $transitTime = ' (' . str_replace(array('_', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen'), array(' business ', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), strtolower($rate['operationalDetail']['transitTime'])) . ')';
+                  $transitTime = ' (' . str_replace(array('_', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen'), array(' business ', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), strtolower($rate['operationalDetail']['transitTime'] ?? '')) . ')';
                }
                $id_suffix = ''; 
                if (!empty($rate['commit']['saturdayDelivery']) && $rate['commit']['saturdayDelivery'] == 1) {

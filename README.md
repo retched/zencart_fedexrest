@@ -58,5 +58,5 @@ Note that you must test with items that are not free shipping and do not use the
 Be sure the FedEx Account Number, ship from address, etc. for the old and new shipping modules have the same values to get an apples-to-apples comparison.
 
 ### Appearance in Storefront
-![FedEx quotes in the Storefront](images/doc_storefront.png)
+![FedEx quotes in the Storefront](screenshots/doc_storefront.png)
 
