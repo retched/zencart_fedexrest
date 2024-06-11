@@ -326,6 +326,10 @@
             $country_id = $this->country_iso($order->delivery['country']);
          }
 
+         //Skip the state if the state is over 2 characters, such as New Zealand, Germany and Spain. Otherwise no quote.
+         $skip_state_country = array ('NZ','DE','ES');
+         if(in_array($country_id, $skip_state_country))
+            $state = '';
 
          $this->fedex_shipping_num_boxes = ($shipping_num_boxes > 0 ? $shipping_num_boxes : 1);
          $this->fedex_shipping_weight = $shipping_weight;
