@@ -8,6 +8,7 @@ Contributions supporting the development of this software are most appreciated. 
 
 - [Installation instructions](https://github.com/scottcwilson/zencart_fedexrest/wiki/Installation-Instructions)
 - [Forum Support Thread](https://www.zen-cart.com/showthread.php?229562-FedEx-Shipping-using-REST-API)
+- [Plugins Library Page](https://www.zen-cart.com/downloads.php?do=file&id=2375)
 
 ### Developer Resources
 
