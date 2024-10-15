@@ -276,8 +276,9 @@
                foreach ($arr_response['errors'] as $errobj) {
                   if ($errobj['code'] == 'NOT.AUTHORIZED.ERROR') {
                         global $db;
-                        $db->Execute("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = 'false' WHERE configuration_key = 'MODULE_SHIPPING_FEDEX_REST_STATUS'");
-                        zen_mail(STORE_NAME, STORE_OWNER_EMAIL_ADDRESS, MODULE_SHIPPING_FEDEXREST_EMAIL_SUBJECT, MODULE_SHIPPING_FEDEXREST_INVALID_CREDENTIALS, STORE_NAME, EMAIL_FROM);
+                        // Not going to disable at this time. 
+                        // $db->Execute("UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = 'false' WHERE configuration_key = 'MODULE_SHIPPING_FEDEX_REST_STATUS'");
+                        // zen_mail(STORE_NAME, STORE_OWNER_EMAIL_ADDRESS, MODULE_SHIPPING_FEDEXREST_EMAIL_SUBJECT, MODULE_SHIPPING_FEDEXREST_INVALID_CREDENTIALS, STORE_NAME, EMAIL_FROM);
                   }
                }
             }
