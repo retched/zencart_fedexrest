@@ -71,7 +71,7 @@
        * @var int
        */
       protected $_check;
-      protected $moduleVersion = '1.3.2';
+      protected $moduleVersion = '1.3.4';
 
       protected $fedex_act_num,
          $country,
