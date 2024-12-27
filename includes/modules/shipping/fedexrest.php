@@ -138,9 +138,9 @@
                $this->enabled = false;
             }
          }
-        if ($this->enabled === true && $this->getOAuthToken() === false) {
+         if ($this->enabled === true && $this->getOAuthToken() === false) {
             $this->enabled = false;
-        }
+         }
          if ($this->enabled) {
             if (IS_ADMIN_FLAG === false) {
 
@@ -229,11 +229,11 @@
 
       function getOAuthToken()
       {
-          if (isset($_SESSION['fedexrest_token_expires']) && $_SESSION['fedexrest_token_expires'] > time()) {
-              $this->debugLog('Existing OAuth token is present.');
-              return true;
-          }
-  
+         if (isset($_SESSION['fedexrest_token_expires']) && $_SESSION['fedexrest_token_expires'] > time()) {
+            $this->debugLog('Existing OAuth token is present.');
+            return true;
+         }
+
          // Get the bearer token
          // https://developer.fedex.com/api/en-us/catalog/authorization/v1/docs.html
 
@@ -381,9 +381,9 @@
             'returnTransitTimes' => (MODULE_SHIPPING_FEDEX_REST_TRANSIT_TIME == 'true' ? 'TRUE' : 'FALSE'),
          ];
          if (MODULE_SHIPPING_FEDEX_REST_SATURDAY == 'true') {
-           $requestControlParms += [
-              'variableOptions' => 'SATURDAY_DELIVERY', 
-           ]; 
+            $requestControlParms += [
+               'variableOptions' => 'SATURDAY_DELIVERY', 
+            ]; 
          }
 
          if (MODULE_SHIPPING_FEDEX_REST_SHIP_TO_RESIDENCE == 'true') {
@@ -642,7 +642,7 @@
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Insurance', 'MODULE_SHIPPING_FEDEX_REST_INSURE', '-1', 'Insure packages when subtotal is greater than or equal to (set to -1 to disable):', '6', '120', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Shipping Zone', 'MODULE_SHIPPING_FEDEX_REST_ZONE', '0', 'If a zone is selected, only enable this shipping method for that zone.', '6', '130', 'zen_get_zone_class_title', 'zen_cfg_pull_down_zone_classes(', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Tax Class', 'MODULE_SHIPPING_FEDEX_REST_TAX_CLASS', '0', 'Use the following tax class on the shipping fee.', '6', '135', 'zen_get_tax_class_title', 'zen_cfg_pull_down_tax_classes(', now())");
-    $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Tax Basis', 'MODULE_SHIPPING_FEDEX_REST_TAX_BASIS', 'Shipping', 'On what basis is Shipping Tax calculated. Options are<br>Shipping - Based on customers Shipping Address<br>Billing Based on customers Billing address<br>Store - Based on Store address if Billing/Shipping Zone equals Store zone', '6', '0', 'zen_cfg_select_option(array(\'Shipping\', \'Billing\', \'Store\'), ', now())");
+         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Tax Basis', 'MODULE_SHIPPING_FEDEX_REST_TAX_BASIS', 'Shipping', 'On what basis is Shipping Tax calculated. Options are<br>Shipping - Based on customers Shipping Address<br>Billing Based on customers Billing address<br>Store - Based on Store address if Billing/Shipping Zone equals Store zone', '6', '0', 'zen_cfg_select_option(array(\'Shipping\', \'Billing\', \'Store\'), ', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_SHIPPING_FEDEX_REST_SORT_ORDER', '0', 'Sort order of display.', '6', '998', now())");
          $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Debug', 'MODULE_SHIPPING_FEDEX_REST_DEBUG', 'false', 'Turn On Debugging?', '6', '999', 'zen_cfg_select_option(array(\'true\', \'false\'), ', now())");
       }
