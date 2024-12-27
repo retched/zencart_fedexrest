@@ -84,7 +84,7 @@
 
       function __construct()
       {
-         global $order, $db;
+         global $order, $db, $template, $current_page_base;
 
          $this->code = "fedexrest";
          $this->title = MODULE_SHIPPING_FEDEX_REST_TEXT_TITLE;
@@ -143,8 +143,11 @@
         }
          if ($this->enabled) {
             if (IS_ADMIN_FLAG === false) {
+
                $this->setTypes();
-            }
+               if (isset($template)) $this->icon = $template->get_template_dir('shipping_fedex.gif', DIR_WS_TEMPLATE, $current_page_base, 'images/icons') . '/shipping_fedex.gif';
+
+            } 
          }
       }
 
@@ -500,6 +503,7 @@
          $quotes = [
             'id' => $this->code,
             'module' => $this->title . $show_box_weight,
+            'icon' => zen_image($this->icon),
          ];
          $methods = [];
          foreach ($arr_response['output']['rateReplyDetails'] as $rate) {
